@@ -1,0 +1,99 @@
+---
+title: "車禍與測速照相機之關聯"
+output: github_document
+---
+題目:車禍與測速照相機之關係
+資料介紹與來源:測速執法設置點、A1類交通事故資料  政府資料開放平台
+格式:csv
+分析議題:車禍的發生太過於平凡，新聞上太多因車禍而發生的悲劇，所以我想藉此了解車禍和測速照相的關係
+假設:測速照相機的位置比較不會發生車禍
+分析結果:否定，有測速照相機的位置並沒有減少車禍的發生
+分析結果可能解決的問題:可以藉由此分析結果加強容易車禍地點的臨檢，確實的減少車禍的發生
+
+```{r}
+library(readr)
+accidentP <- read_csv("C:/Users/Blackcross/Downloads/accidentP.csv")
+library(readr)
+photoP <- read_csv("C:/Users/Blackcross/Downloads/photoP.csv" )
+```
+
+
+
+```{r}
+library(dplyr)
+accident<-group_by(accidentP,district)
+summarise(accident,nlocation=n())%>%
+arrange(desc(nlocation))
+
+photo<-group_by(photoP,district)
+summarise(photo,nlocation=n())%>%
+arrange(desc(nlocation))
+```
+
+
+```{r}
+library(ggmap)
+photoP$longitude<-as.numeric(photoP$longitude)
+photoP$latitude<-as.numeric(photoP$latitude)
+
+NewTaipeiMap <- get_map(
+    location = c(121.30,24.80,121.99,25.30), 
+    zoom = 10, maptype = 'roadmap')
+NewTaipeiMap0 <- ggmap(NewTaipeiMap)+ 
+    geom_point(data=photoP, 
+               aes(x=longitude, y=latitude,
+                   color="red"))
+ggmap(NewTaipeiMap,extent = 'device')
+NewTaipeiMap0
+
+```
+
+```{r}
+library(ggmap)
+accidentP$longitude<-as.numeric(accidentP$longitude)
+accidentP$latitude<-as.numeric(accidentP$latitude)
+
+NewTaipeiMap <- get_map(
+    location = c(121.30,24.80,121.99,25.30), 
+    zoom = 10, maptype = 'roadmap')
+NewTaipeiMap1 <- ggmap(NewTaipeiMap)+ 
+    geom_point(data=accidentP, 
+               aes(x=longitude, y=latitude,
+                   color="red"))
+ggmap(NewTaipeiMap,extent = 'device')
+NewTaipeiMap1
+
+```
+
+```{r}
+library(ggmap)
+ZhongheMap <- get_map(
+    location = "Zhonghe", 
+    zoom = 12, maptype = 'roadmap')
+ZhongheMap0 <- ggmap(ZhongheMap)+ 
+    geom_point(data=photoP, 
+               aes(x=longitude, y=latitude,
+                   color="red"))
+ggmap(ZhongheMap,extent = 'device')
+ZhongheMap0
+
+```
+
+
+```{r}
+library(ggmap)
+ZhongheMap <- get_map(
+    location = "Zhonghe", 
+    zoom = 12, maptype = 'roadmap')
+ZhongheMap1 <- ggmap(ZhongheMap)+ 
+    geom_point(data=accidentP, 
+               aes(x=longitude, y=latitude,
+                   color="red"))
+ggmap(ZhongheMap,extent = 'device')
+ZhongheMap1
+```
+
+
+
+
+
